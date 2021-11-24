@@ -41,10 +41,7 @@ export default class DateTimePicker extends PureComponent {
   componentDidUpdate(prevProps, prevState) {
     const { isCalendarOpen, isClockOpen } = this.state;
     const {
-      onCalendarClose,
-      onCalendarOpen,
-      onClockClose,
-      onClockOpen,
+      onCalendarClose, onCalendarOpen, onClockClose, onClockOpen,
     } = this.props;
 
     const isWidgetOpen = isCalendarOpen || isClockOpen;
@@ -79,7 +76,7 @@ export default class DateTimePicker extends PureComponent {
     if (this.wrapper && !this.wrapper.contains(target)) {
       this.closeWidgets();
     }
-  }
+  };
 
   onDateChange = (value, closeWidgets) => {
     const { value: prevValue } = this.props;
@@ -97,7 +94,7 @@ export default class DateTimePicker extends PureComponent {
     } else {
       this.onChange(value, closeWidgets);
     }
-  }
+  };
 
   // eslint-disable-next-line react/destructuring-assignment
   onChange = (value, closeWidgets = this.props.closeWidgets) => {
@@ -110,14 +107,10 @@ export default class DateTimePicker extends PureComponent {
     if (onChange) {
       onChange(value);
     }
-  }
+  };
 
   onFocus = (event) => {
-    const {
-      disabled,
-      onFocus,
-      openWidgetsOnFocus,
-    } = this.props;
+    const { disabled, onFocus, openWidgetsOnFocus } = this.props;
 
     if (onFocus) {
       onFocus(event);
@@ -148,34 +141,34 @@ export default class DateTimePicker extends PureComponent {
         default:
       }
     }
-  }
+  };
 
   onKeyDown = (event) => {
     if (event.key === 'Escape') {
       this.closeWidgets();
     }
-  }
+  };
 
   openClock = () => {
     this.setState({
       isCalendarOpen: false,
       isClockOpen: true,
     });
-  }
+  };
 
   openCalendar = () => {
     this.setState({
       isCalendarOpen: true,
       isClockOpen: false,
     });
-  }
+  };
 
   toggleCalendar = () => {
     this.setState((prevState) => ({
       isCalendarOpen: !prevState.isCalendarOpen,
       isClockOpen: false,
     }));
-  }
+  };
 
   closeWidgets = () => {
     this.setState((prevState) => {
@@ -188,7 +181,7 @@ export default class DateTimePicker extends PureComponent {
         isClockOpen: false,
       };
     });
-  }
+  };
 
   stopPropagation = (event) => event.stopPropagation();
 
@@ -198,10 +191,15 @@ export default class DateTimePicker extends PureComponent {
     const { isCalendarOpen, isClockOpen } = this.state;
     const isWidgetOpen = isCalendarOpen || isClockOpen;
 
+    const { currentDocument } = this.props;
+
     const shouldListenWithFallback = typeof shouldListen !== 'undefined' ? shouldListen : isWidgetOpen;
-    const fnName = shouldListenWithFallback ? 'addEventListener' : 'removeEventListener';
-    outsideActionEvents.forEach((eventName) => document[fnName](eventName, this.onOutsideAction));
-    document[fnName]('keydown', this.onKeyDown);
+    const fnName = shouldListenWithFallback
+      ? 'addEventListener'
+      : 'removeEventListener';
+    // eslint-disable-next-line max-len
+    outsideActionEvents.forEach((eventName) => currentDocument[fnName](eventName, this.onOutsideAction));
+    currentDocument[fnName]('keydown', this.onKeyDown);
   }
 
   renderInputs() {
@@ -332,7 +330,12 @@ export default class DateTimePicker extends PureComponent {
 
     return (
       <Fit>
-        <div className={mergeClassNames(className, `${className}--${isCalendarOpen ? 'open' : 'closed'}`)}>
+        <div
+          className={mergeClassNames(
+            className,
+            `${className}--${isCalendarOpen ? 'open' : 'closed'}`,
+          )}
+        >
           <Calendar
             className={calendarClassName}
             onChange={this.onDateChange}
@@ -368,7 +371,12 @@ export default class DateTimePicker extends PureComponent {
 
     return (
       <Fit>
-        <div className={mergeClassNames(className, `${className}--${isClockOpen ? 'open' : 'closed'}`)}>
+        <div
+          className={mergeClassNames(
+            className,
+            `${className}--${isClockOpen ? 'open' : 'closed'}`,
+          )}
+        >
           <Clock
             className={clockClassName}
             renderMinuteHand={maxDetailIndex > 0}
@@ -451,6 +459,7 @@ DateTimePicker.defaultProps = {
   isCalendarOpen: null,
   isClockOpen: null,
   maxDetail: 'minute',
+  currentDocument: document,
   openWidgetsOnFocus: true,
 };
 
@@ -479,6 +488,8 @@ DateTimePicker.propTypes = {
     PropTypes.arrayOf(PropTypes.string),
   ]),
   closeWidgets: PropTypes.bool,
+  // eslint-disable-next-line react/forbid-prop-types
+  currentDocument: PropTypes.any,
   dayAriaLabel: PropTypes.string,
   dayPlaceholder: PropTypes.string,
   disableCalendar: PropTypes.bool,
@@ -510,10 +521,7 @@ DateTimePicker.propTypes = {
   secondAriaLabel: PropTypes.string,
   secondPlaceholder: PropTypes.string,
   showLeadingZeros: PropTypes.bool,
-  value: PropTypes.oneOfType([
-    isValue,
-    PropTypes.arrayOf(isValue),
-  ]),
+  value: PropTypes.oneOfType([isValue, PropTypes.arrayOf(isValue)]),
   yearAriaLabel: PropTypes.string,
   yearPlaceholder: PropTypes.string,
 };
